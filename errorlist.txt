@@ -1,0 +1,4 @@
+Mongoose .pre('save') does not trigger
+
+take care of async and await
+
