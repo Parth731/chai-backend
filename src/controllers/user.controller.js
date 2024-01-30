@@ -277,7 +277,11 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 export const changeCurrentPassword = asyncHandler(async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  if (newPassword === confirmPassword) {
+    throw new ApiError(400, "new password and confirm password can not same");
+  }
 
   const user = await User.findById(req.user?._id);
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
@@ -506,4 +510,16 @@ export const getWatchHistory = asyncHandler(async (req, res) => {
         "Watch history fetched successfully"
       )
     );
+});
+
+export const getAllUsers = asyncHandler(async (req, res) => {
+  // Get all users except the current logged in user.
+  let alluser = await User.find();
+  if (!alluser) {
+    throw new Error("No Users Found");
+  }
+  console.log(alluser);
+  return res
+    .status(200)
+    .json(new ApiResponse(200, alluser, "fetch all user successfully"));
 });

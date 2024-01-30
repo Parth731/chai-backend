@@ -14,6 +14,7 @@
 
 import {
   changeCurrentPassword,
+  getAllUsers,
   getCurrentUser,
   getUserChannelProfile,
   getWatchHistory,
@@ -63,4 +64,5 @@ export default function (app) {
   );
   app.get("/api/v1/users/c/:username", verifyJWT, getUserChannelProfile);
   app.get("/api/v1/users/history", verifyJWT, getWatchHistory);
+  app.get("/api/v1/users/getallusers", getAllUsers);
 }
