@@ -353,7 +353,7 @@ export const updateUserAvatar = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Avatar image updated successfully"));
 });
 
-const updateUserCoverImage = asyncHandler(async (req, res) => {
+export const updateUserCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path;
 
   if (!coverImageLocalPath) {
@@ -383,49 +383,46 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Cover image updated successfully"));
 });
 
-export const getUserChanelProfile = asyncHandler(async (req, res) => {
+export const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
+
   if (!username?.trim()) {
-    throw new ApiError(400, "Username should not be empty");
+    throw new ApiError(400, "username is missing");
   }
 
   const channel = await User.aggregate([
-    // match user
     {
       $match: {
         username: username?.toLowerCase(),
       },
     },
-    // howmany subscriber
     {
       $lookup: {
-        from: "Subscription",
+        from: "subscriptions",
         localField: "_id",
         foreignField: "channel",
-        as: "subscribers", //meri channel ne kis kis ne subscribe karke rakha hai
+        as: "subscribers",
       },
     },
-    //
     {
       $lookup: {
-        from: "Subscription",
+        from: "subscriptions",
         localField: "_id",
         foreignField: "subscriber",
-        as: "subscribersTo", //maine kis channel ko subscribe karke rakha hai
+        as: "subscribedTo",
       },
     },
-    // count of subscriber
     {
       $addFields: {
         subscribersCount: {
           $size: "$subscribers",
         },
         channelsSubscribedToCount: {
-          $size: "$subscribersTo",
+          $size: "$subscribedTo",
         },
         isSubscribed: {
           $cond: {
-            if: { $in: [req?.user?._id, "$subscribers.subscriber"] },
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
             then: true,
             else: false,
           },
@@ -445,7 +442,7 @@ export const getUserChanelProfile = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  console.log(channel);
+
   if (!channel?.length) {
     throw new ApiError(404, "channel does not exists");
   }
@@ -499,6 +496,7 @@ export const getWatchHistory = asyncHandler(async (req, res) => {
       },
     },
   ]);
+
   return res
     .status(200)
     .json(
