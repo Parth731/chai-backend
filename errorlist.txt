@@ -2,3 +2,43 @@ Mongoose .pre('save') does not trigger
 
 take care of async and await
 
+what is pipeline 
+what is aggregation
+what is variable in mongodb
+
+
+Books
+
+_id:1,
+title:"The Great Getsby",
+author_id:100,
+genre:"Classic"
+
+authors
+
+_id: 100,
+name: "F. Scott Fitzgerald,
+birth_year: 1896 
+
+
+books doc  has a reference to authors document using author_id as the foreign key.
+[
+    {
+        $lookup:{
+            form:"authors",
+            localField:"author_id",
+            foreignField:"_id",
+            as:"test"
+        },
+
+    },
+    {
+        $addFields:{
+            author_details:{
+                $first:"$test",
+                 $arrayElemAt:["$author_details",0]
+            }
+        }
+    }
+]
+
