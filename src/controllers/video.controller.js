@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import mongoose from "mongoose";
 
-const getAllVideos = asyncHandler(async (req, res) => {
+const getAllVideosWithSearch = asyncHandler(async (req, res) => {
   //   const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
   //TODO: get all videos based on query, sort, pagination
 
@@ -284,12 +284,50 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
   }
 });
 
+const getAllVideosWithoutSearch = asyncHandler(async (req, res) => {
+  try {
+    // /videos?userId=65f8dbeee51d01d76423e35a&page=1&limit=2&searchQuery=mera&sortBy=description&sortType=asc
+    const { page = 1, limit = 10, sortBy, sortType, userId } = req.query;
+
+    if (!sortBy && !sortType) {
+      throw new ApiError(400, "Sorting parameters are required");
+    }
+    if (!page && !limit) {
+      throw new ApiError(400, "Pagination parameters are required");
+    }
+    // console.log(searchQuery);
+    const skip = (page - 1) * limit;
+    const result = await Video.aggregate([
+      //   { $match: { ownerId: userId } },
+      // {
+      //   $match: {
+      //     title: { $regex: searchQuery, $options: "i" },
+      //   },
+      // },
+      {
+        $sort: { [sortBy]: sortType === "desc" ? -1 : 1 },
+      },
+      // {
+      //   $skip: skip,
+      // },
+      // { $limit: parseInt(limit) },
+    ]);
+    // console.log(result);
+    res
+      .status(200)
+      .json(new ApiResponse(200, result, "fetch videos successfully"));
+  } catch (error) {
+    throw new ApiError(500, "internal server error");
+  }
+});
+
 export {
-  getAllVideos,
+  getAllVideosWithSearch,
   publishAVideo,
   getVideoById,
   updateVideo,
   deleteVideo,
   togglePublishStatus,
   handleVideoView,
+  getAllVideosWithoutSearch,
 };

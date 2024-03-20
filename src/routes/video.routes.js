@@ -1,11 +1,12 @@
 import {
   getVideoById,
-  getAllVideos,
   handleVideoView,
   publishAVideo,
   updateVideo,
   togglePublishStatus,
   deleteVideo,
+  getAllVideosWithoutSearch,
+  getAllVideosWithSearch,
 } from "../controllers/video.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -27,7 +28,8 @@ export default function (app) {
     publishAVideo
   );
 
-  app.get("/api/v1/videos", verifyJWT, getAllVideos);
+  app.get("/api/v1/videos", verifyJWT, getAllVideosWithSearch);
+  app.get("/api/v1/videos/all", verifyJWT, getAllVideosWithoutSearch);
   app.get("/api/v1/videos/view/:videoId", verifyJWT, handleVideoView);
   app.get("/api/v1/videos/:videoId", verifyJWT, getVideoById);
   app.patch(
