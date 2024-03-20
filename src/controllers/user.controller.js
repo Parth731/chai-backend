@@ -447,6 +447,8 @@ export const getUserChannelProfile = asyncHandler(async (req, res) => {
     },
   ]);
 
+  console.log(channel);
+
   if (!channel?.length) {
     throw new ApiError(404, "channel does not exists");
   }
@@ -462,7 +464,7 @@ export const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
       $match: {
-        _id: new mongoose.Types.ObjectId(req.user._id),
+        _id: new mongoose.Types.ObjectId(req.user._id), //mongodb id convert to the mongoose id
       },
     },
     {
@@ -523,3 +525,41 @@ export const getAllUsers = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, alluser, "fetch all user successfully"));
 });
+
+/*
+const asyncHandler = require('express-async-handler');
+const Video = require('../models/Video'); // Assuming you have a Video model defined
+
+const getAllVideos = asyncHandler(async (req, res) => {
+    let { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    const filter = {};
+    if (query) {
+        // You might want to adjust this based on how you want to perform the query
+        filter.title = { $regex: query, $options: 'i' }; // Case-insensitive search for title
+    }
+    if (userId) {
+        filter.userId = userId;
+    }
+
+    const sortOptions = {};
+    if (sortBy) {
+        sortOptions[sortBy] = sortType === 'desc' ? -1 : 1;
+    }
+
+    const videos = await Video.find(filter)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit);
+
+    res.json(videos);
+});
+
+module.exports = getAllVideos;
+
+
+*/

@@ -20,6 +20,8 @@ app.use(cookieParser());
 // app.use("/api", userRouter);
 
 import webRoutes from "./routes/user.routes.js";
+import videoRoutes from "./routes/video.routes.js";
 webRoutes(app);
+videoRoutes(app);
 
 export { app };
