@@ -21,7 +21,9 @@ app.use(cookieParser());
 
 import webRoutes from "./routes/user.routes.js";
 import videoRoutes from "./routes/video.routes.js";
+import tweetRoutes from "./routes/tweet.routes.js";
 webRoutes(app);
 videoRoutes(app);
+tweetRoutes(app);
 
 export { app };
